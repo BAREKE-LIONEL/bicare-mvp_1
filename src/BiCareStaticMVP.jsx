@@ -1,4 +1,5 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import { motion } from "framer-motion";
 // shadcn/ui (real or stubbed)
 import { Button } from "@/components/ui/button";
@@ -49,13 +50,6 @@ const LOGO_FALLBACK_SVG =
 /* =========================
    i18n (RW default)
    ========================= */
-const LangCtx = React.createContext({ lang: "rw", setLang: (_v) => {} });
-const useLang = () => useContext(LangCtx);
-const tr = (lang, rw, en) => (lang === "rw" ? rw : en);
-const T = ({ rw, en }) => {
-  const { lang } = useLang();
-  return <>{tr(lang, rw, en)}</>;
-};
 
 /* =========================
    Small UI helpers
@@ -182,7 +176,7 @@ function OmniChannelPreview() {
    Patient / Family
    ========================= */
 function PatientHome() {
-  const { lang } = useLang();
+  const { t } = useTranslation();
   const [done, setDone] = useState(["education"]);
   const [selectedGuide, setSelectedGuide] = useState(null);
   const [emrShared, setEmrShared] = useState(true);
@@ -194,7 +188,7 @@ function PatientHome() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* Tasks */}
-      <Section title={<T rw="Imirimo y'uyu munsi" en="Today’s Tasks" />} subtitle={<T rw="Kanda urangize cyangwa ushireho kwibutsa" en="Tap to complete or snooze" />}>
+      <Section title={t("Today’s Tasks")} subtitle={t("Tap to complete or snooze")}>
         <div className="flex items-center gap-4 mb-4">
           <div className="text-center">
             <ProgressRing progress={progress} />
@@ -214,18 +208,16 @@ function PatientHome() {
           ))}
         </div>
         <div className="text-xs text-gray-500 mt-2">
-          {lang === "rw" ? (
-            <>Ukeneye ubufasha? Koresha <span className="font-semibold">Saba AI</span> cyangwa kande <span className="font-semibold">Red-Flag</span>.</>
-          ) : (
-            <>Need help? Use <span className="font-semibold">Ask AI</span> or press <span className="font-semibold">Red-Flag</span>.</>
-          )}
+          <Trans i18nKey="helpText">
+            Need help? Use <span className="font-semibold">Ask AI</span> or press <span className="font-semibold">Red-Flag</span>.
+          </Trans>
         </div>
       </Section>
 
       {/* Next Visit */}
       <Section
-        title={<T rw="Uruzinduko rukurikira" en="Next Visit" />}
-        subtitle={<T rw="Rendez-vous yawe ikurikira" en="Your upcoming appointment" />}
+        title={t("Next Visit")}
+        subtitle={t("Your upcoming appointment")}
         right={
           <Badge variant="secondary" className="gap-1">
             <CalendarDays className="h-3 w-3" /> D+3
@@ -239,12 +231,12 @@ function PatientHome() {
 
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="mt-2 w-full"><T rw="Ukeneye ubufasha bwo gutwara?" en="Add transport help?" /></Button>
+              <Button className="mt-2 w-full">{t("Add transport help?")}</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[420px]">
               <DialogHeader>
-                <DialogTitle><T rw="Ubufasha bwo gutwara" en="Transport assistance" /></DialogTitle>
-                <DialogDescription><T rw="Tumenyesha Abafasha bari hafi" en="We’ll notify nearby Care Guides for escort support." /></DialogDescription>
+                <DialogTitle>{t("Transport assistance")}</DialogTitle>
+                <DialogDescription>{t("We’ll notify nearby Care Guides for escort support.")}</DialogDescription>
               </DialogHeader>
               <div className="grid gap-3">
                 <Label>Pickup location</Label>
@@ -269,27 +261,27 @@ function PatientHome() {
 
       {/* Ask AI */}
       <Section
-        title={<T rw="Saba AI (ifite umuforomo)" en="Ask AI (with nurse backup)" />}
-        subtitle={<T rw="Kinyarwanda • Icyongereza" en="Kinyarwanda • English" />}
+        title={t("Ask AI (with nurse backup)")}
+        subtitle={t("Kinyarwanda • English")}
         right={<Badge className="bg-blue-600 text-white"><Bot className="h-3 w-3 mr-1" /> Online</Badge>}
       >
         <div className="grid gap-2">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {(lang === "rw"
-              ? "Uburibwe,Kuzungera,Kwita ku gisebe,Ingaruka z'imiti,Indyo,Amasaha y'imiti"
-              : "Pain,Dizziness,Wound care,Side-effects,Diet,Medication timing"
-            ).split(",").map((c) => (
-              <Button key={c} variant="secondary" className="justify-start">{c}</Button>
-            ))}
+            {"Pain,Dizziness,Wound care,Side-effects,Diet,Medication timing"
+              .split(",")
+              .map((c) => (
+                <Button key={c} variant="secondary" className="justify-start">
+                  {t(c)}
+                </Button>
+              ))}
           </div>
           <div className="border rounded-xl p-3 bg-white">
-            <div className="text-sm"><span className="font-semibold"><T rw="Wowe:" en="You:" /></span> <T rw="Ndumva umutwe unyerera cyane." en="I feel very dizzy." /></div>
+            <div className="text-sm"><span className="font-semibold">{t("You:")}</span> {t("I feel very dizzy.")}</div>
             <div className="text-sm mt-1">
-              <span className="font-semibold"><T rw="BiCare:" en="BiCare:" /></span>{" "}
-              <T
-                rw="Kuzungera gashobora guterwa no kubura amazi mu mubiri cyangwa imiti urimo gufata. Icara hasi, nywa amazi, kandi wirinde guhaguruka utunguranye. Niba bijyanye n’ububabare mu gituza cyangwa gusinzira, kanda Red-Flag kugira ngo uhabwe umuforomo ako kanya."
-                en="Dizziness can be caused by dehydration or medications. Sit down, drink water, and avoid sudden movements. If combined with chest pain or fainting, press Red-Flag to reach a nurse immediately."
-              />
+              <span className="font-semibold">{t("BiCare:")}</span>{" "}
+              {t(
+                "Dizziness can be caused by dehydration or medications. Sit down, drink water, and avoid sudden movements. If combined with chest pain or fainting, press Red-Flag to reach a nurse immediately."
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2"><Input disabled placeholder="Type a message (demo)" /><Button disabled>Send</Button></div>
@@ -298,7 +290,7 @@ function PatientHome() {
       </Section>
 
       {/* Connections & Consent */}
-      <Section title={<T rw="Uhuza & Uruhushya" en="Connections & Consent" />} subtitle={<T rw="Gena abareba amakuru yawe" en="Control who can view your data" />} right={<Badge variant="outline" className="gap-1"><ShieldCheck className="h-3 w-3" /> 30 days left</Badge>}>
+      <Section title={t("Connections & Consent")} subtitle={t("Control who can view your data")} right={<Badge variant="outline" className="gap-1"><ShieldCheck className="h-3 w-3" /> 30 days left</Badge>}>
         <div className="flex items-center justify-between p-3 border rounded-xl bg-white">
           <div>
             <div className="font-medium">Kigali Teaching Hospital EMR</div>
@@ -314,17 +306,17 @@ function PatientHome() {
       </Section>
 
       {/* Health Data Hub with source chips */}
-      <Section title={<T rw="Iby'ubuzima" en="Health Data Hub" />} subtitle={<T rw="Gusoma gusa n’inkomoko y’amakuru" en="Read-only view with source tags" />}>
+      <Section title={t("Health Data Hub")} subtitle={t("Read-only view with source tags")}>
         <div className="grid md:grid-cols-2 gap-3 text-sm">
           <div className="border rounded-xl p-3 bg-white">
-            <div className="font-semibold mb-2"><T rw="Imiti" en="Medications" /></div>
+            <div className="font-semibold mb-2">{t("Medications")}</div>
             <ul className="space-y-2">
               <li className="flex items-center justify-between"><span>Amlodipine 5mg</span>{dataChip("Local")}</li>
               <li className="flex items-center justify-between"><span>Paracetamol 1g PRN</span>{dataChip("Local")}</li>
             </ul>
           </div>
           <div className="border rounded-xl p-3 bg-white">
-            <div className="font-semibold mb-2"><T rw="Ibyorezo/Indwara" en="Conditions" /></div>
+            <div className="font-semibold mb-2">{t("Conditions")}</div>
             <ul className="space-y-2">
               <li className="flex items-center justify-between"><span>Hypertension</span>{dataChip("Local")}</li>
               <li className="flex items-center justify-between"><span>Post-op day 1</span>{dataChip("Local")}</li>
@@ -334,7 +326,7 @@ function PatientHome() {
       </Section>
 
       {/* Care Plan */}
-      <Section title={<T rw="Gahunda yo Kwita ku Murwayi" en="Care Plan" />} subtitle={<T rw="Impine y’ingenzi" en="One-pager summary" />}>
+      <Section title={t("Care Plan")} subtitle={t("One-pager summary")}>
         <div className="grid md:grid-cols-2 gap-3 text-sm">
           <div className="border rounded-xl p-3 bg-white">
             <div className="font-semibold mb-2">Summary</div>
@@ -358,36 +350,42 @@ function PatientHome() {
       </Section>
 
       {/* Micro-Courses */}
-      <Section title={<T rw="Amasomo yoroheje" en="Micro-Courses" />} subtitle={<T rw="Ubufasha ku miryango n'abafasha bo mu rugo" en="For families and home caregivers" />}>
+      <Section title={t("Micro-Courses")} subtitle={t("For families and home caregivers")}>
         <div className="grid md:grid-cols-3 gap-3">
           {[
             {
               id: "course1",
-              titleRw: "Isuku y'igisebe (10')",
-              titleEn: "Wound hygiene (10')",
+              title: "Wound hygiene (10')",
               progress: 60,
-              stepsRw: ["Karaba intoki iminota 1 (amazi & isabune).", "Koza ku ruhande rw'igisebe, ntukore ku rufunzo.", "Hindura dressing neza."],
-              stepsEn: ["Wash hands for 1 minute (soap & water).", "Clean around the wound, avoid touching the wound bed.", "Replace dressing carefully."],
+              steps: [
+                "Wash hands for 1 minute (soap & water).",
+                "Clean around the wound, avoid touching the wound bed.",
+                "Replace dressing carefully."
+              ]
             },
             {
               id: "course2",
-              titleRw: "Gupima ibipimo by'ingenzi (8')",
-              titleEn: "Taking vitals (8')",
+              title: "Taking vitals (8')",
               progress: 20,
-              stepsRw: ["Fata BP wicaye (uruhuke iminota 5).", "Andika SYS/DIA & pulse.", "Ubonye ibidasanzwe, kanda Red-Flag."],
-              stepsEn: ["Measure blood pressure seated (rest 5’).", "Record SYS/DIA & pulse.", "If abnormal, press Red-Flag."],
+              steps: [
+                "Measure blood pressure seated (rest 5’).",
+                "Record SYS/DIA & pulse.",
+                "If abnormal, press Red-Flag."
+              ]
             },
             {
               id: "course3",
-              titleRw: "Guteganya amasaha y’imiti (6')",
-              titleEn: "Safe meds timing (6')",
+              title: "Safe meds timing (6')",
               progress: 0,
-              stepsRw: ["Soma amabwiriza y’umuti.", "Kurikiza amasaha wahawe (kwibutsa).", "Niba wibeshye ku rugero, saba umuforomo."],
-              stepsEn: ["Always read the medication instructions.", "Follow the scheduled times (reminders help).", "If you miss/double a dose, ask a nurse."],
-            },
+              steps: [
+                "Always read the medication instructions.",
+                "Follow the scheduled times (reminders help).",
+                "If you miss/double a dose, ask a nurse."
+              ]
+            }
           ].map((c) => (
             <div key={c.id} className="p-3 border rounded-xl bg-white">
-              <div className="font-medium text-sm"><T rw={c.titleRw} en={c.titleEn} /></div>
+              <div className="font-medium text-sm">{t(c.title)}</div>
               <div className="h-2 bg-gray-100 rounded mt-2 overflow-hidden">
                 <div className="h-full bg-teal-500" style={{ width: `${c.progress}%` }} />
               </div>
@@ -395,28 +393,30 @@ function PatientHome() {
                 <span>{c.progress}%</span>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button size="sm" variant={c.progress ? "secondary" : "default"}>{c.progress ? <T rw="Komeza" en="Resume" /> : <T rw="Tangira" en="Start" />}</Button>
+                    <Button size="sm" variant={c.progress ? "secondary" : "default"}>{c.progress ? t("Resume") : t("Start")}</Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[460px]">
                     <DialogHeader>
-                      <DialogTitle><T rw={c.titleRw} en={c.titleEn} /></DialogTitle>
-                      <DialogDescription><T rw="Isomo rito ry'imyitozo ku miryango — nta makuru bwite atanzwe." en="Short practice lesson for families — no personal data involved." /></DialogDescription>
+                      <DialogTitle>{t(c.title)}</DialogTitle>
+                      <DialogDescription>{t("Short practice lesson for families — no personal data involved.")}</DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-3 text-sm">
                       <div className="rounded-lg border p-3 bg-gray-50">
-                        <div className="font-medium mb-1"><T rw="Intambwe z'ingenzi" en="Key steps" /></div>
+                        <div className="font-medium mb-1">{t("Key steps")}</div>
                         <ul className="list-disc pl-5 space-y-1">
-                          {(lang === "rw" ? c.stepsRw : c.stepsEn).map((s, i) => (<li key={i}>{s}</li>))}
+                          {c.steps.map((s, i) => (
+                            <li key={i}>{t(s)}</li>
+                          ))}
                         </ul>
                       </div>
                       <div className="rounded-lg border p-3">
-                        <div className="font-medium mb-1"><T rw="Icyitonderwa" en="Safety tip" /></div>
-                        <div><T rw="Niba habaye ububabare bukabije, kuruka, cyangwa umwijima mu maso — kanda Red-Flag." en="If severe pain, vomiting, or faintness occurs — press Red-Flag." /></div>
+                        <div className="font-medium mb-1">{t("Safety tip")}</div>
+                        <div>{t("If severe pain, vomiting, or faintness occurs — press Red-Flag.")}</div>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button><T rw="Birumvikana" en="Got it" /></Button>
-                      <Button variant="secondary"><T rw="Subira nyuma" en="Review later" /></Button>
+                      <Button>{t("Got it")}</Button>
+                      <Button variant="secondary">{t("Review later")}</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -427,21 +427,21 @@ function PatientHome() {
       </Section>
 
       {/* Book a Care Guide (improved) */}
-      <Section title={<T rw="Shaka Uwamufasha" en="Book a Care Guide" />} subtitle={<T rw="Abari hafi, babanje kugenzurwa" en="Nearby, vetted helpers" />}>
+      <Section title={t("Book a Care Guide")} subtitle={t("Nearby, vetted helpers")}>
         <div className="grid lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 grid gap-3">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input placeholder={lang === "rw" ? "Shakisha izina cyangwa ubumenyi (n: Wound care)" : "Search by name or skill (e.g., Wound care)"} />
-              <Select defaultValue="kigali" onValueChange={() => {}}>
-                <SelectTrigger className="sm:w-[200px]">
-                  <SelectValue placeholder={lang === "rw" ? "Intara" : "Region"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="kigali">Kigali</SelectItem>
-                  <SelectItem value="musanze">Musanze</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <div className="lg:col-span-2 grid gap-3">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input placeholder={t("Search by name or skill (e.g., Wound care)")} />
+                <Select defaultValue="kigali" onValueChange={() => {}}>
+                  <SelectTrigger className="sm:w-[200px]">
+                    <SelectValue placeholder={t("Region")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="kigali">Kigali</SelectItem>
+                    <SelectItem value="musanze">Musanze</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             <div className="grid md:grid-cols-2 gap-3">
               {guides.map((g) => {
                 const initials = `${g.name.split(" ")[0][0]}${g.name.split(" ")[1]?.[0] ?? ""}`;
@@ -465,8 +465,8 @@ function PatientHome() {
                     </CardHeader>
                     <CardContent className="grid gap-2">
                       <div className="flex flex-wrap gap-2">{g.skills.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)}</div>
-                      <div className="text-sm text-gray-600">{g.rating} ★ • RWF {g.price}</div>
-                      <Button variant="outline" className="justify-center">{lang === "rw" ? "Hitamo" : "Select"}</Button>
+                        <div className="text-sm text-gray-600">{g.rating} ★ • RWF {g.price}</div>
+                        <Button variant="outline" className="justify-center">{t("Select")}</Button>
                     </CardContent>
                   </Card>
                 );
@@ -478,7 +478,7 @@ function PatientHome() {
             {!selectedGuide ? (
               <Card className="rounded-xl border-dashed">
                 <CardContent className="p-6 text-sm text-gray-600">
-                  {lang === "rw" ? "Hitamo umufasha ku ruhande rw'ibumoso kugira ngo ubone ibisobanuro n'ubwishyu." : "Pick a guide on the left to see details and payment."}
+                  {t("Pick a guide on the left to see details and payment.")}
                 </CardContent>
               </Card>
             ) : (() => {
@@ -492,13 +492,13 @@ function PatientHome() {
                   </CardHeader>
                   <CardContent className="grid gap-3">
                     <div className="flex flex-wrap gap-2">{g.skills.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)}</div>
-                    <div className="text-sm">{lang === "rw" ? "Igiciro" : "Price"}: <span className="font-medium">RWF {g.price}</span></div>
+                    <div className="text-sm">{t("Price")}: <span className="font-medium">RWF {g.price}</span></div>
                     <Dialog>
-                      <DialogTrigger asChild><Button className="w-full">{lang === "rw" ? `Bukinga ${fn}` : `Book ${fn}`}</Button></DialogTrigger>
+                      <DialogTrigger asChild><Button className="w-full">{t("Book {{name}}", { name: fn })}</Button></DialogTrigger>
                       <DialogContent className="sm:max-w-[420px]">
                         <DialogHeader>
-                          <DialogTitle>{lang === "rw" ? "Kwemeza ubufasha" : "Confirm booking"}</DialogTitle>
-                          <DialogDescription>{lang === "rw" ? "Kwishyura kuri mobile money (demo)." : "Mobile money payment will be simulated for this demo."}</DialogDescription>
+                          <DialogTitle>{t("Confirm booking")}</DialogTitle>
+                          <DialogDescription>{t("Mobile money payment will be simulated for this demo.")}</DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-3 text-sm">
                           <div className="flex items-center gap-2"><Wallet className="h-4 w-4" /> Amount: RWF {g.price}</div>
@@ -512,7 +512,7 @@ function PatientHome() {
                           </Select>
                         </div>
                         <DialogFooter>
-                          <Button className="w-full" variant="default"><CheckCircle2 className="h-4 w-4 mr-1" /> {lang === "rw" ? "Simulate Success" : "Simulate Payment Success"}</Button>
+                          <Button className="w-full" variant="default"><CheckCircle2 className="h-4 w-4 mr-1" /> {t("Simulate Payment Success")}</Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
@@ -525,7 +525,7 @@ function PatientHome() {
       </Section>
 
       {/* Access Log */}
-      <Section title={<T rw="Ibaruwa y'Amahoro" en="Access Log" />} subtitle={<T rw="Ni bande basomye ikihe gice ry’amakuru ryari ryasangiwe" en="Who read what, and when" />}>
+      <Section title={t("Access Log")} subtitle={t("Who read what, and when")}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -970,11 +970,10 @@ function OrgPortal() {
    ========================= */
 export default function BiCareStaticMVP() {
   const [role, setRole] = useState("patient"); // "patient" | "guide" | "nurse" | "org"
-  const [lang, setLang] = useState("rw");
   const [logoSrc, setLogoSrc] = useState(LOGO_URL);
+  const { t, i18n } = useTranslation();
 
   return (
-    <LangCtx.Provider value={{ lang, setLang }}>
       <div className="min-h-screen bg-gray-50 text-gray-900">
         <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/60 bg-white border-b">
           <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
@@ -989,12 +988,12 @@ export default function BiCareStaticMVP() {
               </div>
               <div>
                 <div className="font-semibold text-lg">BiCare 360</div>
-                <div className="text-xs text-gray-500"><T rw="Imbata y'ubuvuzi ihoraho — mu rugo" en="Continuity of care — at home" /></div>
+                <div className="text-xs text-gray-500">{t("Continuity of care — at home")}</div>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <Select value={lang} onValueChange={setLang}>
+              <Select value={i18n.language} onValueChange={(lng) => i18n.changeLanguage(lng)}>
                 <SelectTrigger className="w-[120px]"><SelectValue placeholder="Language" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="rw">Kinyarwanda</SelectItem>
@@ -1005,10 +1004,10 @@ export default function BiCareStaticMVP() {
               <Select value={role} onValueChange={setRole}>
                 <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="patient"><T rw="Umurwayi / Umuryango" en="Patient / Family" /></SelectItem>
-                  <SelectItem value="guide"><T rw="Umufasha" en="Care Guide" /></SelectItem>
-                  <SelectItem value="nurse"><T rw="Umuforomo" en="Nurse" /></SelectItem>
-                  <SelectItem value="org"><T rw="Ivuriro / Mutuelle" en="Hospital / Insurer" /></SelectItem>
+                  <SelectItem value="patient">{t("Patient / Family")}</SelectItem>
+                  <SelectItem value="guide">{t("Care Guide")}</SelectItem>
+                  <SelectItem value="nurse">{t("Nurse")}</SelectItem>
+                  <SelectItem value="org">{t("Hospital / Insurer")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1020,10 +1019,10 @@ export default function BiCareStaticMVP() {
             <Card className="rounded-2xl">
               <CardContent className="py-5">
                 <div className="grid md:grid-cols-4 gap-4">
-                  <div className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-teal-600" /><div><div className="font-medium"><T rw="Icya mbere: Uruhushya" en="Consent-first" /></div><div className="text-sm text-gray-600"><T rw="Ugenzura gusangira & umukono w’uburenganzira" en="Patient controls sharing & access logs" /></div></div></div>
-                  <div className="flex items-center gap-3"><TriangleAlert className="h-5 w-5 text-red-600" /><div><div className="font-medium"><T rw="Umuforomo mu minota 10" en="Nurse within 10 min" /></div><div className="text-sm text-gray-600"><T rw="Red-flag ijya kuri triage ihita" en="Red-flags route to live triage" /></div></div></div>
-                  <div className="flex items-center gap-3"><PhoneCall className="h-5 w-5 text-blue-600" /><div><div className="font-medium"><T rw="Imiyoboro myinshi" en="Omni-channel" /></div><div className="text-sm text-gray-600">App, WhatsApp, USSD, IVR</div></div></div>
-                  <div className="flex items-center gap-3"><Cpu className="h-5 w-5 text-purple-600" /><div><div className="font-medium">AI + Human</div><div className="text-sm text-gray-600"><T rw="Inyunganizi n’isesengura, bijyana n’umuntu ubishinzwe" en="Guidance with safe handoff" /></div></div></div>
+                  <div className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-teal-600" /><div><div className="font-medium">{t("Consent-first")}</div><div className="text-sm text-gray-600">{t("Patient controls sharing & access logs")}</div></div></div>
+                  <div className="flex items-center gap-3"><TriangleAlert className="h-5 w-5 text-red-600" /><div><div className="font-medium">{t("Nurse within 10 min")}</div><div className="text-sm text-gray-600">{t("Red-flags route to live triage")}</div></div></div>
+                  <div className="flex items-center gap-3"><PhoneCall className="h-5 w-5 text-blue-600" /><div><div className="font-medium">{t("Omni-channel")}</div><div className="text-sm text-gray-600">App, WhatsApp, USSD, IVR</div></div></div>
+                  <div className="flex items-center gap-3"><Cpu className="h-5 w-5 text-purple-600" /><div><div className="font-medium">AI + Human</div><div className="text-sm text-gray-600">{t("Guidance with safe handoff")}</div></div></div>
                 </div>
               </CardContent>
             </Card>
@@ -1032,7 +1031,7 @@ export default function BiCareStaticMVP() {
           {role === "patient" && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
               <div className="flex items-center justify-between mb-2">
-                <div className="text-lg font-semibold flex items-center gap-2"><UserRound className="h-5 w-5" /> <T rw="Umuyoboro w'Umurwayi" en="Patient Portal" /></div>
+                <div className="text-lg font-semibold flex items-center gap-2"><UserRound className="h-5 w-5" /> {t("Patient Portal")}</div>
                 <div className="flex items-center gap-2 text-sm"><Badge variant="secondary">RW/EN</Badge><Badge variant="outline">Demo only</Badge></div>
               </div>
               <PatientHome />
@@ -1041,21 +1040,21 @@ export default function BiCareStaticMVP() {
 
           {role === "guide" && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              <div className="text-lg font-semibold flex items-center gap-2 mb-2"><Users className="h-5 w-5" /> <T rw="App ya Abafasha" en="Care Guide App" /></div>
+              <div className="text-lg font-semibold flex items-center gap-2 mb-2"><Users className="h-5 w-5" /> {t("Care Guide App")}</div>
               <CareGuide />
             </motion.div>
           )}
 
           {role === "nurse" && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              <div className="text-lg font-semibold flex items-center gap-2 mb-2"><Stethoscope className="h-5 w-5" /> <T rw="Ikibaho cy’Umuforomo" en="Nurse Console" /></div>
+              <div className="text-lg font-semibold flex items-center gap-2 mb-2"><Stethoscope className="h-5 w-5" /> {t("Nurse Console")}</div>
               <NurseConsole />
             </motion.div>
           )}
 
           {role === "org" && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              <div className="text-lg font-semibold flex items-center gap-2 mb-2"><Hospital className="h-5 w-5" /> <T rw="Ivuriro / Mutuelle" en="Hospital / Insurer" /></div>
+              <div className="text-lg font-semibold flex items-center gap-2 mb-2"><Hospital className="h-5 w-5" /> {t("Hospital / Insurer")}</div>
               <OrgPortal />
             </motion.div>
           )}
@@ -1068,6 +1067,5 @@ export default function BiCareStaticMVP() {
           </footer>
         </main>
       </div>
-    </LangCtx.Provider>
   );
 }
